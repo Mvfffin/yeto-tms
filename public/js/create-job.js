@@ -9,28 +9,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const selectedCustomerIdInput = document.getElementById('selected-customer-id');
     const autocompleteResults = document.getElementById('autocomplete-results');
     
-    // --- Autocomplete Logic ---
+    // Autocomplete Logic (no changes here)
     customerNameInput.addEventListener('keyup', async (e) => {
         const searchTerm = customerNameInput.value.trim();
-
-        // Clear results if the search term is empty
         if (searchTerm === '') {
             autocompleteResults.innerHTML = '';
             autocompleteResults.classList.add('hidden');
-            selectedCustomerIdInput.value = ''; // Clear selected ID
+            selectedCustomerIdInput.value = '';
             return;
         }
-
-        // Query Firestore for customers whose companyName starts with the search term
         const customersRef = collection(db, "customers");
         const q = query(customersRef, 
             where("companyName", ">=", searchTerm),
-            where("companyName", "<=", searchTerm + '\uf8ff') // '\uf8ff' is a magic character that helps with "starts with" queries
+            where("companyName", "<=", searchTerm + '\uf8ff')
         );
-
         const querySnapshot = await getDocs(q);
-        
-        autocompleteResults.innerHTML = ''; // Clear previous results
+        autocompleteResults.innerHTML = '';
         if (querySnapshot.empty) {
             autocompleteResults.classList.add('hidden');
         } else {
@@ -40,27 +34,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 const resultItem = document.createElement('div');
                 resultItem.classList.add('p-2', 'hover:bg-gray-100', 'cursor-pointer');
                 resultItem.textContent = customer.companyName;
-                
-                // Add click listener to each result item
                 resultItem.addEventListener('click', () => {
-                    customerNameInput.value = customer.companyName; // Set the input value
-                    customerContactInput.value = customer.phoneNumber; // Auto-fill the contact number
-                    selectedCustomerIdInput.value = doc.id; // Store the customer's ID
-                    autocompleteResults.classList.add('hidden'); // Hide the results box
+                    customerNameInput.value = customer.companyName;
+                    customerContactInput.value = customer.phoneNumber;
+                    selectedCustomerIdInput.value = doc.id;
+                    autocompleteResults.classList.add('hidden');
                 });
-
                 autocompleteResults.appendChild(resultItem);
             });
         }
     });
 
-    // --- Form Submission Logic (Updated) ---
+    // Form Submission Logic (Updated)
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
 
         if (!confirm('Are you sure you want to create this job?')) {
             return;
         }
+
+        // --- FIX FOR DATES ---
+        // Get the date values from the form
+        const pickupDateValue = document.getElementById('pickup-date').value;
+        const deliveryDateValue = document.getElementById('delivery-date').value;
+
+        const jobPrice = parseFloat(document.getElementById('job-price').value) || 0;
+        const driverCost = parseFloat(document.getElementById('driver-cost').value) || 0;
 
         const newJob = {
             pickupLocation: {
@@ -69,17 +68,19 @@ document.addEventListener('DOMContentLoaded', () => {
             deliveryLocation: {
                 address: document.getElementById('delivery-address').value,
             },
-            pickupDate: new Date(document.getElementById('pickup-date').value),
-            deliveryDate: new Date(document.getElementById('delivery-date').value),
+            // Only create a Date object if a date was actually entered
+            pickupDate: pickupDateValue ? new Date(pickupDateValue) : null,
+            deliveryDate: deliveryDateValue ? new Date(deliveryDateValue) : null,
             cargoDetails: document.getElementById('cargo-details').value,
             customerInfo: {
                 name: customerNameInput.value,
                 contactNumber: customerContactInput.value,
-                // Now we store the customer's database ID with the job
                 customerId: selectedCustomerIdInput.value || null 
             },
-            assignedDriverId: document.getElementById('assign-driver').value,
-            assignedVehicleId: document.getElementById('assign-vehicle').value,
+            driverName: document.getElementById('driver-name').value,
+            vehicleReg: document.getElementById('vehicle-reg').value,
+            jobPrice: jobPrice,
+            driverCost: driverCost,
             status: 'Pending',
             createdAt: serverTimestamp()
         };
@@ -89,6 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log("Document written with ID: ", docRef.id);
             alert('Job created successfully!');
             form.reset();
+            selectedCustomerIdInput.value = '';
         } catch (e) {
             console.error("Error adding document: ", e);
             alert('Error creating job. Please check the console for details.');
