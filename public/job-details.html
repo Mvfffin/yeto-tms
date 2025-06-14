@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Details | YETO TMS</title>
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+
+    <!-- Header -->
+    <header class="bg-white shadow">
+        <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+            <a href="/" class="text-blue-600 hover:text-blue-800">&larr; Back to Dashboard</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div id="job-details-container" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Job Info Column -->
+            <div class="lg:col-span-2 bg-white shadow rounded-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">Job Details for Customer: <span id="customer-name-header">Loading...</span></h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Pickup Details -->
+                    <div>
+                        <h3 class="font-bold text-gray-800">Pickup</h3>
+                        <p id="pickup-address" class="text-gray-600">Loading...</p>
+                        <p id="pickup-date" class="text-gray-600 font-semibold">Loading...</p>
+                    </div>
+                    <!-- Delivery Details -->
+                    <div>
+                        <h3 class="font-bold text-gray-800">Delivery</h3>
+                        <p id="delivery-address" class="text-gray-600">Loading...</p>
+                        <p id="delivery-date" class="text-gray-600 font-semibold">Loading...</p>
+                    </div>
+                    <!-- Cargo Details -->
+                    <div class="md:col-span-2">
+                        <h3 class="font-bold text-gray-800">Cargo Details</h3>
+                        <p id="cargo-details" class="text-gray-600">Loading...</p>
+                    </div>
+                     <!-- Customer Details -->
+                    <div class="md:col-span-2">
+                        <h3 class="font-bold text-gray-800">Customer Contact</h3>
+                        <p id="customer-contact" class="text-gray-600">Loading...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status & Actions Column -->
+            <div class="bg-white shadow rounded-lg p-6 h-fit">
+                <h3 class="text-xl font-bold text-gray-900">Status & Actions</h3>
+                <div class="mt-4">
+                    <label for="job-status" class="block text-sm font-medium text-gray-700">Update Job Status</label>
+                    <select id="job-status" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                        <option>Pending</option>
+                        <option>Assigned</option>
+                        <option>In Transit</option>
+                        <option>Delayed</option>
+                        <option>Completed</option>
+                        <option>Cancelled</option>
+                    </select>
+                </div>
+                <button id="update-status-btn" class="mt-4 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg shadow">
+                    Update Status
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Firebase and Page Scripts -->
+    <script type="module" src="/js/firebase-config.js"></script>
+    <script type="module" src="/js/job-details.js"></script>
+</body>
+</html>

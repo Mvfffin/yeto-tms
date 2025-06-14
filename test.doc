@@ -1,0 +1,12 @@
+const firebaseConfig = {
+  apiKey: "AIzaSyDlJiT0jItmwsU4f74O3dvbU-rGH5dGxg8",
+  authDomain: "yeto-tms.firebaseapp.com",
+  projectId: "yeto-tms",
+  storageBucket: "yeto-tms.firebasestorage.app",
+  messagingSenderId: "947336191481",
+  appId: "1:947336191481:web:697aade7c525daf360f128"
+};
+
+
+
+

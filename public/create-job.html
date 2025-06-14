@@ -10,6 +10,90 @@
     <h1 class="text-3xl font-bold text-center text-gray-800 my-8">
         Create a New Transport Job
     </h1>
+    
+    <!-- The opening form tag now includes id="create-job-form" -->
+    <form id="create-job-form" class="max-w-4xl mx-auto p-8 bg-white rounded-lg shadow-md">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
 
-    </body>
+            <!-- Pickup Information -->
+            <div class="border-b pb-4 col-span-1 md:col-span-2">
+                <h2 class="text-xl font-semibold text-gray-800">Pickup Details</h2>
+            </div>
+            <div>
+                <label for="pickup-address" class="block text-sm font-bold text-gray-700">Address</label>
+                <input type="text" id="pickup-address" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+                <label for="pickup-date" class="block text-sm font-bold text-gray-700">Date</label>
+                <input type="date" id="pickup-date" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <!-- Delivery Information -->
+            <div class="border-b pb-4 col-span-1 md:col-span-2 mt-6">
+                <h2 class="text-xl font-semibold text-gray-800">Delivery Details</h2>
+            </div>
+            <div>
+                <label for="delivery-address" class="block text-sm font-bold text-gray-700">Address</label>
+                <input type="text" id="delivery-address" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+                <label for="delivery-date" class="block text-sm font-bold text-gray-700">Date</label>
+                <input type="date" id="delivery-date" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            
+            <!-- Job Details -->
+<!-- Job & Customer Information -->
+<div class="border-b pb-4 col-span-1 md:col-span-2 mt-6">
+    <h2 class="text-xl font-semibold text-gray-800">Job & Customer Information</h2>
+</div>
+<div class="col-span-1 md:col-span-2">
+    <label for="cargo-details" class="block text-sm font-bold text-gray-700">Cargo Details</label>
+    <textarea id="cargo-details" rows="4" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+</div>
+<!-- Customer Name Autocomplete -->
+<div class="relative">
+    <label for="customer-name" class="block text-sm font-bold text-gray-700">Customer Name</label>
+    <input type="text" id="customer-name" autocomplete="off" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+    <!-- This hidden input will store the selected customer's ID -->
+    <input type="hidden" id="selected-customer-id">
+    <!-- This div will hold the search results -->
+    <div id="autocomplete-results" class="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg mt-1 hidden"></div>
+</div>
+<div>
+    <label for="customer-contact" class="block text-sm font-bold text-gray-700">Customer Contact Number</label>
+    <input type="tel" id="customer-contact" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+</div>
+            <!-- Assignment -->
+            <div class="border-b pb-4 col-span-1 md:col-span-2 mt-6">
+                <h2 class="text-xl font-semibold text-gray-800">Assignment</h2>
+            </div>
+            <div>
+                <label for="assign-driver" class="block text-sm font-bold text-gray-700">Assign Driver</label>
+                <select id="assign-driver" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="" disabled selected>Select a driver...</option>
+                    <!-- Driver options will be loaded here later -->
+                </select>
+            </div>
+            <div>
+                <label for="assign-vehicle" class="block text-sm font-bold text-gray-700">Assign Vehicle</label>
+                <select id="assign-vehicle" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="" disabled selected>Select a vehicle...</option>
+                    <!-- Vehicle options will be loaded here later -->
+                </select>
+            </div>
+
+        </div>
+
+        <!-- Submit Button -->
+        <div class="mt-8 flex justify-end">
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg shadow">
+                Create Job
+            </button>
+        </div>
+    </form>
+
+    <!-- Firebase and Page Scripts -->
+    <script type="module" src="/js/firebase-config.js"></script>
+    <script type="module" src="/js/create-job.js"></script>
+</body>
 </html>
