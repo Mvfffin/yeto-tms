@@ -8,5 +8,276 @@ const firebaseConfig = {
 };
 
 
+// In public/js/create-job.js
 
 
+
+import { db } from './firebase-config.js';
+
+import { collection, query, where, getDocs, addDoc, Timestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+
+const customerNameInput = document.getElementById('customer-name');
+
+const selectedCustomerIdInput = document.getElementById('selected-customer-id');
+
+const autocompleteResultsDiv = document.getElementById('autocomplete-results');
+
+const createJobForm = document.getElementById('create-job-form');
+
+
+
+// --- Autocomplete for Customer Name (Corrected Version) ---
+
+let customerTimeout;
+
+customerNameInput.addEventListener('input', () => {
+
+clearTimeout(customerTimeout);
+
+const searchTerm = customerNameInput.value.trim();
+
+
+if (searchTerm.length < 2) { // Start search after 2 characters
+
+autocompleteResultsDiv.innerHTML = '';
+
+autocompleteResultsDiv.classList.add('hidden');
+
+selectedCustomerIdInput.value = ''; // Clear selected ID if search term is too short
+
+return;
+
+}
+
+
+// This function efficiently searches Firestore as the user types
+
+customerTimeout = setTimeout(async () => {
+
+try {
+
+const customersRef = collection(db, "customers");
+
+// This query finds company names that start with the search term
+
+const q = query(customersRef,
+
+where("companyName", ">=", searchTerm),
+
+where("companyName", "<=", searchTerm + '\uf8ff')
+
+);
+
+const querySnapshot = await getDocs(q);
+
+const filteredCustomers = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+
+displayAutocompleteResults(filteredCustomers);
+
+
+
+} catch (error) {
+
+console.error("Error fetching customers for autocomplete:", error);
+
+autocompleteResultsDiv.innerHTML = '<div class="px-4 py-2 text-red-500">Error loading customers.</div>';
+
+autocompleteResultsDiv.classList.remove('hidden');
+
+}
+
+}, 300); // Debounce time to avoid too many queries
+
+});
+
+
+
+function displayAutocompleteResults(results) {
+
+autocompleteResultsDiv.innerHTML = '';
+
+if (results.length === 0) {
+
+autocompleteResultsDiv.classList.add('hidden');
+
+return;
+
+}
+
+
+
+results.forEach(customer => {
+
+const item = document.createElement('div');
+
+item.classList.add('autocomplete-item', 'px-4', 'py-3', 'text-sm', 'border-b', 'border-gray-100', 'cursor-pointer', 'hover:bg-gray-100');
+
+item.textContent = customer.companyName; // Use companyName as per your customers.js
+
+item.dataset.customerId = customer.id;
+
+item.dataset.customerName = customer.companyName;
+
+
+
+item.addEventListener('click', () => {
+
+customerNameInput.value = customer.companyName;
+
+selectedCustomerIdInput.value = customer.id;
+
+autocompleteResultsDiv.classList.add('hidden');
+
+});
+
+autocompleteResultsDiv.appendChild(item);
+
+});
+
+autocompleteResultsDiv.classList.remove('hidden');
+
+}
+
+
+
+// Hide autocomplete results when clicking outside
+
+document.addEventListener('click', (event) => {
+
+if (!autocompleteResultsDiv.contains(event.target) && event.target !== customerNameInput) {
+
+autocompleteResultsDiv.classList.add('hidden');
+
+}
+
+});
+
+
+
+// --- Form Submission Handler ---
+
+createJobForm.addEventListener('submit', async (event) => {
+
+event.preventDefault(); // Prevent default form submission
+
+
+
+const jobData = {
+
+pickup: {
+
+companyName: document.getElementById('company-name').value,
+
+addressLine1: document.getElementById('address-line-1').value,
+
+addressLine2: document.getElementById('address-line-2').value,
+
+cityTown: document.getElementById('pickup-city-town').value,
+
+postcode: document.getElementById('postcode').value,
+
+date: document.getElementById('pickup-date').value,
+
+time: `${document.getElementById('pickup-hour').value}:${document.getElementById('pickup-minute').value}`,
+
+timeQualifier: document.getElementById('pickup-time-qualifier').value
+
+},
+
+delivery: {
+
+companyName: document.getElementById('delivery-company-name').value,
+
+addressLine1: document.getElementById('delivery-address-line-1').value,
+
+addressLine2: document.getElementById('delivery-address-line-2').value,
+
+cityTown: document.getElementById('delivery-city-town').value,
+
+postcode: document.getElementById('delivery-postcode').value,
+
+date: document.getElementById('delivery-date').value,
+
+time: `${document.getElementById('delivery-hour').value}:${document.getElementById('delivery-minute').value}`,
+
+timeQualifier: document.getElementById('delivery-time-qualifier').value
+
+}, // <--- FIX: Added the missing closing brace and comma
+
+
+
+customer: {
+
+id: selectedCustomerIdInput.value,
+
+name: customerNameInput.value,
+
+contact: document.getElementById('customer-contact').value,
+
+cargoDetails: document.getElementById('cargo-details').value,
+
+},
+
+assignment: {
+
+driverName: document.getElementById('driver-name').value,
+
+vehicleReg: document.getElementById('vehicle-reg').value,
+
+jobPrice: parseFloat(document.getElementById('job-price').value) || 0,
+
+driverCost: parseFloat(document.getElementById('driver-cost').value) || 0,
+
+},
+
+createdAt: Timestamp.now(),
+
+status: 'Pending',
+
+};
+
+
+
+// Calculate profit
+
+jobData.assignment.profit = jobData.assignment.jobPrice - jobData.assignment.driverCost;
+
+
+
+console.log("Job Data to be submitted:", jobData);
+
+
+
+try {
+
+const docRef = await addDoc(collection(db, "jobs"), jobData);
+
+console.log("Document written with ID: ", docRef.id);
+
+alert('Job created successfully!');
+
+createJobForm.reset();
+
+
+// Reset UI elements
+
+document.getElementById('profit-display').textContent = '£0.00';
+
+document.querySelector('.tab-button[data-tab="pickup"]').click();
+
+
+
+} catch (e) {
+
+console.error("Error adding document: ", e);
+
+alert('Error creating job. Please try again.');
+
+}
+
+});

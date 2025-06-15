@@ -1,3 +1,5 @@
+// In public/js/job-details.js
+
 import { db } from './firebase-config.js';
 import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
@@ -29,23 +31,24 @@ document.addEventListener('DOMContentLoaded', () => {
     // Reference to the specific job document in Firestore
     const jobDocRef = doc(db, "jobs", jobId);
 
+    // --- THIS IS THE SECTION TO REPLACE ---
     // Fetch the document data to populate the page
     getDoc(jobDocRef).then((docSnap) => {
         if (docSnap.exists()) {
             const job = docSnap.data();
             
-            // Populate customer and job info
-            customerNameHeader.textContent = job.customerInfo.name || 'N/A';
-            pickupAddress.textContent = job.pickupLocation.address || 'N/A';
-            pickupDateEl.textContent = job.pickupDate ? job.pickupDate.toDate().toLocaleDateString() : 'N/A';
-            deliveryAddress.textContent = job.deliveryLocation.address || 'N/A';
-            deliveryDateEl.textContent = job.deliveryDate ? job.deliveryDate.toDate().toLocaleDateString() : 'N/A';
-            cargoDetails.textContent = job.cargoDetails || 'N/A';
-            customerContact.textContent = job.customerInfo.contactNumber || 'N/A';
+            // FIX: Populate using the correct data structure (e.g., job.customer.name)
+            customerNameHeader.textContent = job.customer.name || 'N/A';
+            pickupAddress.textContent = `${job.pickup.addressLine1 || ''}, ${job.pickup.cityTown || ''}`;
+            pickupDateEl.textContent = job.pickup.date ? new Date(job.pickup.date).toLocaleDateString() : 'N/A';
+            deliveryAddress.textContent = `${job.delivery.addressLine1 || ''}, ${job.delivery.cityTown || ''}`;
+            deliveryDateEl.textContent = job.delivery.date ? new Date(job.delivery.date).toLocaleDateString() : 'N/A';
+            cargoDetails.textContent = job.customer.cargoDetails || 'N/A';
+            customerContact.textContent = job.customer.contact || 'N/A';
             
-            // Populate the assignment and status fields
-            driverNameInput.value = job.driverName || ''; // Use job.driverName
-            vehicleRegInput.value = job.vehicleReg || ''; // Use job.vehicleReg
+            // FIX: Populate the assignment and status fields from the 'assignment' object
+            driverNameInput.value = job.assignment.driverName || '';
+            vehicleRegInput.value = job.assignment.vehicleReg || '';
             jobStatusSelect.value = job.status;
 
         } else {
@@ -53,12 +56,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // --- AND REPLACE THIS SECTION TOO ---
     // Add click listener for the "Save Changes" button
     updateJobBtn.addEventListener('click', async () => {
+        // FIX: Update the fields inside the 'assignment' object in Firestore
         const updates = {
-            driverName: driverNameInput.value,
-            vehicleReg: vehicleRegInput.value,
-            status: jobStatusSelect.value
+            'assignment.driverName': driverNameInput.value,
+            'assignment.vehicleReg': vehicleRegInput.value,
+            'status': jobStatusSelect.value
         };
 
         try {
